@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const cartsCollection = 'cart'
 
-const cartsSchema = mongoose.Schema({
+const cartsSchema = new mongoose.Schema({
     
     products:{
         type: [
