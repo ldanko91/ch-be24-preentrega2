@@ -2,10 +2,13 @@
 import express from "express";
 import mongoose from "mongoose";
 import handlebars from "express-handlebars";
+import { Server } from "socket.io";
+
 
 //RUTAS
 import dbProdsRouter from "./routes/dbProds.routes.js";
 import dbCartsRouter from "./routes/dbCarts.routes.js";
+import dbChatRouter from "./routes/dbChat.routes.js";
 
 //UTILS
 import __dirname from "./dirname.js";
@@ -31,6 +34,35 @@ app.set('views', __dirname + '/views')
 app.set('view engine', 'handlebars');
 app.use(express.static(__dirname + '/public'))
 
+//config Chat Socket
+import ChatsDBManager from "./dao/dbManagers/ChatDBManager.js";
+const DBChatManager = new ChatsDBManager();
+const socketServer = new Server(httpServer)
+
+socketServer.on('connection', socket => {
+    console.log("Nuevo cliente conectado");
+
+    const emitOldMessages = () => {
+        const messages = DBChatManager.getMessages();
+        socket.emit('message-showOldMessages', messages);
+    };
+
+    // Emitir mensajes antiguos cuando un nuevo cliente se conecta
+    emitOldMessages();
+
+    socket.on('sendMessage', data => {
+        console.log(data);
+        console.log("Mensaje enviado");
+
+        // Agregar el nuevo mensaje
+        DBChatManager.addMessage(data);
+
+        // Emitir mensajes antiguos después de agregar el nuevo mensaje
+        emitOldMessages();
+    });
+});
+
 //vistas HBS!
 app.use('/api/products', dbProdsRouter)
 app.use('/api/carts', dbCartsRouter)
+app.use('/chat', dbChatRouter)

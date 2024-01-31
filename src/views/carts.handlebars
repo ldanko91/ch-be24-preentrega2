@@ -1,18 +1,16 @@
-<h1>Productos en el carrito</h1>
+<h1>Listado de carritos</h1>
 <section id="carritos">
     <div>
         {{#each carritos}}
         <div>
-            <h2>Carrito con ID:{{_id}}</h2>
+            <a href="/api/carts/{{_id}}">
+                <h2>Carrito {{_id}}</h2>
+            </a>
             {{#each this.products}}
             <ul>
                 <li>Cantidad: {{this.quantity}}</li>
-                <li>{{this.product.title}}</li>
+                <li>{{this.products.title}}</li>
                 <li>ID:{{this.id}}</li>
-                <li>{{this.description}}</li>
-                <li>Categoría:{{this.category}}</li>
-                <li>Código:{{this.code}}</li>
-                <li>Stock:{{this.stock}}</li>
             </ul>
             <button>Quitar del carrito</button>
             {{/each}}

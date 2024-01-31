@@ -14,16 +14,33 @@ export default class CartsDBManager {
     getCarts = async (req, res) => {
         try {
             let carritos = await cartsModel.find({}, { __v: 0 }).lean().populate({ path: 'products.product' });
-            // res.json({ status: 'Success', payload: carritos })
             return carritos
         } catch (error) {
             console.log(error)
         }
-
     }
-    getCartById = async(getCode)=>{
-        let carritos = await cartsModel.findOne({_id:getCode}).populate({path:'products.id',model:productsModel});
-        return carritos
+
+    getCartById = async (getCode) => {
+        try {
+            let carrito = await cartsModel.findOne({ _id: getCode }).lean().populate({ path: 'products.id', model: productsModel });
+            // console.log(carrito)
+            return carrito
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    addToCartById = async (cId, pId) => {
+        try {
+            let carrito = await cartsModel.findOne({ _id: cId }).lean().populate({ path: 'products.id', model: productsModel });
+            let prodsInCart = carrito.products;
+            const newProd = { id: pId, quantity: 1 }
+            prodsInCart.push(newProd)
+            let upload = await cartsModel.updateOne({ _id: cId }, { products: prodsInCart });
+            return upload
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     deleteProductById  = async(cartId,prodId)=>{
@@ -31,16 +48,17 @@ export default class CartsDBManager {
         let prodsInCart = carrito.products;
         let delIndex = prodsInCart.findIndex(producto => producto.id == prodId)
         prodsInCart.splice(delIndex,1)
-        let upload = await cartsModel.updateOne({_id:cartId},prodsInCart);
+        let updateObject = {
+            $set: { products: prodsInCart }
+        };
+        let upload = await cartsModel.updateOne({ _id: cartId }, updateObject);
         return upload
     }
 
-    updateProducts = async(cId,products)=>{
+    updateProducts = async (cId, newProducts) => {
         let carrito = await cartsModel.findOne({_id:cId}).lean();
-        let prodsInCart = carrito.products;
-        prodsInCart = []
-        prodsInCart.push(products)
-        let upload = await cartsModel.updateOne({_id:cartId},prodsInCart);
+        carrito.products = []
+        let upload = await cartsModel.updateOne({ _id: cId }, newProducts);
         return upload
     }
 
@@ -48,17 +66,16 @@ export default class CartsDBManager {
         let carrito = await cartsModel.findOne({_id:cId}).lean();
         let prodsInCart = carrito.products;
         let updIndex = prodsInCart.findIndex(producto => producto.id == pId)
-        let updProd = prodsInCart[updIndex];
-        updProd.quantity = parseInt(newQtty)
-        let upload = await cartsModel.updateOne({_id:cartId},prodsInCart);
+        prodsInCart.splice(updIndex, 1);
+        const newProd = { id: pId, quantity: newQtty }
+        prodsInCart.push(newProd)
+        let upload = await cartsModel.updateOne({ _id: cId }, { products: prodsInCart });
         return upload
     }
 
     emptyCart = async(cId)=>{
         let carrito = await cartsModel.findOne({_id:cId}).lean();
-        let prodsInCart = carrito.products;
-        prodsInCart = []
-        let upload = await cartsModel.updateOne({_id:cartId},prodsInCart);
+        let upload = await cartsModel.updateOne({ _id: cId }, { products: [] });
         return upload
     }
 }

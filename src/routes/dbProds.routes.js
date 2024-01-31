@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, json } from "express";
 import ProductsDBManager from "../dao/dbManagers/ProductsDBManager.js";
 
 const dbProdsRouter = Router();
@@ -7,15 +7,17 @@ const DBProdsManager = new ProductsDBManager();
 dbProdsRouter.get('/', async(req,res)=>{    
     let pageq = parseInt(req.query.page) || 1;
     let limitq = parseInt(req.query.limit) || 10;
-    const filterByq = req.query.filterBy 
+    const filterByq = req.query.filterBy
+    console.log(filterByq)
     const sortByq = req.query.sortBy || "price";
     const sortOrderq = req.query.sortOrder || "asc";
 
-    const {docs,page,hasPrevPage,hasNextPage,prevPage,nextPage} = await DBProdsManager.getProducts(pageq, limitq, filterByq, sortByq, sortOrderq);
-    console.log(docs,page,hasPrevPage,hasNextPage,prevPage,nextPage)
+    const { docs, page, totalPages, hasPrevPage, hasNextPage, prevPage, nextPage } = await DBProdsManager.getProducts(pageq, limitq, filterByq, sortByq, sortOrderq);
+    console.log(page, totalPages, hasPrevPage, hasNextPage, prevPage, nextPage)
     const productos = docs
+    console.table(productos)
     res.render('products', {
-        productos,page,hasPrevPage,hasNextPage,prevPage,nextPage,
+        productos, page, totalPages, hasPrevPage, hasNextPage, prevPage, nextPage,
         title: "Listado de productos"
     })
 })
@@ -24,7 +26,7 @@ dbProdsRouter.get('/:pcod', async(req,res)=>{
     let {pcod} = req.params
     let productos = await DBProdsManager.getProductByCode(pcod);
     console.log(productos);
-    res.render('home',{
+    res.render('productDetail', {
         productos,
         title: `${productos[0].title} código ${pcod}`
     })

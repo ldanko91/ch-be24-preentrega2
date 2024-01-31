@@ -5,11 +5,21 @@ export default class ProductsDBManager {
         console.log('Conectado a MongoDB')
     }
 
-    getProducts = async (pageq, limitq, filterByq, sortByq, sortOrderq) =>{
-        console.log('Primer console log')
+    getProducts = async (pageq, limitq, filterByq, sortByq, sortOrderq) => {
         console.log(pageq, limitq, filterByq, sortByq, sortOrderq)
-        let productos = await productsModel.paginate({filterByq},{page:pageq,limit:limitq,lean:true,sort:([[sortByq,sortOrderq]])})
-        return productos
+        if (filterByq != null) {
+            const formattedFilter = filterByq.replace(/(\w+):/g, '"$1":').replace(/'/g, '');
+            const filter = JSON.parse(`{${formattedFilter}}`);
+
+            let productos = await productsModel.paginate(filter, { page: pageq, limit: limitq, lean: true, sort: ([[sortByq, sortOrderq]]) })
+            return productos
+        }
+        else {
+            let productos = await productsModel.paginate({}, { page: pageq, limit: limitq, lean: true, sort: ([[sortByq, sortOrderq]]) })
+            return productos
+        }
+        // let productos = await productsModel.paginate(filter, { page: pageq, limit: limitq, lean: true, sort: ([[sortByq, sortOrderq]]) })
+        // return productos
     }
 
     getProductByCode = async(getCode)=>{
