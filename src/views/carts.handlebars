@@ -12,7 +12,7 @@
                 <li>{{this.products.title}}</li>
                 <li>ID:{{this.id}}</li>
             </ul>
-            <button>Quitar del carrito</button>
+            <button onclick="delFromCart('{{this.id}}')">Eliminar del carrito</button>
             {{/each}}
         </div>
         {{/each}}
@@ -25,3 +25,4 @@
         {{/if}}
     </div>
 </section>
+<script src="/js/carts.js"></script>

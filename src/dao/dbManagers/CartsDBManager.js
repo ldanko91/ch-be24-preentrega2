@@ -1,5 +1,6 @@
 import cartsModel from "../../models/carritos.js";
 import productsModel from "../../models/productos.js";
+import { ObjectId } from "mongoose";
 
 export default class CartsDBManager {
     constructor(){
@@ -32,10 +33,10 @@ export default class CartsDBManager {
 
     addToCartById = async (cId, pId) => {
         try {
-            let carrito = await cartsModel.findOne({ _id: cId }).lean().populate({ path: 'products.id', model: productsModel });
+            let carrito = await cartsModel.findOne({ _id: cId });
             let prodsInCart = carrito.products;
-            const newProd = { id: pId, quantity: 1 }
-            prodsInCart.push(newProd)
+            const newProd = { id: { _id: pId }, quantity: 1 }
+            prodsInCart.push(newProd);
             let upload = await cartsModel.updateOne({ _id: cId }, { products: prodsInCart });
             return upload
         } catch (error) {

@@ -7,7 +7,7 @@ const DBCartsManager = new CartsDBManager();
 dbCartsRouter.get('/', async(req,res)=>{
     let download = await DBCartsManager.getCarts();
     let carritos = download;
-    console.log(carritos);
+    // console.log(carritos);
     res.render('carts',{
         carritos,
         title: `Listado de carritos`
@@ -33,6 +33,10 @@ dbCartsRouter.post('/', async(req,res)=>{
 
 dbCartsRouter.put('/:cId/products/:pId', async (req, res) => {
     const { cId, pId } = req.params;
+    console.log("cId")
+    console.log(cId)
+    console.log("pId")
+    console.log(pId)
     const addToCart = await DBCartsManager.addToCartById(cId, pId)
     res.send({ status: "success", payload: addToCart })
 })

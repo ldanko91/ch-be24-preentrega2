@@ -16,19 +16,13 @@
                 <li>Código:{{code}}</li>
                 <li>Stock:{{stock}}</li>
             </ul>
-            <button>Agregar al carrito!</button>
+            <button onclick="addToCart('{{_id}}')">Agregar al carrito!</button>
         </div>
         {{/each}}
 
-        {{!-- {{#if hasPrevPage}}
-        <a href="?page={{prevPage}}"><button>Anterior</button></a>
-        {{/if}}
-        <p>Página{{page}} de {{totalPages}}</p>
-        {{#if hasNextPage}}
-        <a href="?page={{nextPage}}"><button>Siguiente</button></a>
-        {{/if}} --}}
     </div>
     <a href="/api/products">
         <h3>Volver al listado general</h3>
     </a>
 </section>
+<script src="/js/product.js"></script>
